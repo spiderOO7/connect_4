@@ -25,8 +25,13 @@ func main() {
 	}
 	defer repo.Close()
 
-	producer := analytics.NewProducer(cfg.KafkaBrokers, "game-analytics")
-	defer producer.Close()
+	var producer *analytics.Producer
+	if len(cfg.KafkaBrokers) > 0 {
+		producer = analytics.NewProducer(cfg.KafkaBrokers, "game-analytics")
+		defer producer.Close()
+	} else {
+		log.Println("analytics disabled: no KAFKA_BROKERS configured")
+	}
 
 	manager := game.NewManager()
 	srv := server.New(cfg, manager, repo, producer)

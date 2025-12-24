@@ -23,6 +23,21 @@ export type LeaderboardEntry = {
 }
 
 export const useGame = () => {
+  const DEFAULT_BACKEND_ORIGIN = 'https://connect-4-backend-4usc.onrender.com'
+
+  const backendOrigin =
+    import.meta.env.VITE_BACKEND_ORIGIN?.replace(/\/$/, '') ||
+    DEFAULT_BACKEND_ORIGIN ||
+    (typeof window !== 'undefined' ? window.location.origin : '')
+
+  const apiUrl = (path: string) => new URL(path, backendOrigin).toString()
+
+  const wsUrl = (path: string) => {
+    const url = new URL(path, backendOrigin)
+    url.protocol = url.protocol === 'https:' ? 'wss:' : 'ws:'
+    return url.toString()
+  }
+
   const [username, setUsername] = useState('')
   const [connected, setConnected] = useState(false)
   const [status, setStatus] = useState('Enter a username to start')
@@ -44,8 +59,7 @@ export const useGame = () => {
     }
 
     const protocol = location.protocol === 'https:' ? 'wss:' : 'ws:'
-    const wsUrl = `${protocol}//${location.host}/ws?username=${encodeURIComponent(username)}`
-    const ws = new WebSocket(wsUrl)
+    const ws = new WebSocket(wsUrl(`/ws?username=${encodeURIComponent(username)}`))
     socketRef.current = ws
 
     ws.onopen = () => {
@@ -109,7 +123,7 @@ export const useGame = () => {
 
   const fetchLeaderboard = useCallback(async () => {
     try {
-      const res = await fetch('/leaderboard')
+      const res = await fetch(apiUrl('/leaderboard'))
       if (res.ok) {
         const data = await res.json()
         setLeaderboard(data)

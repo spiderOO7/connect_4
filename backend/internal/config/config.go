@@ -19,8 +19,8 @@ func Load() Config {
 	return Config{
 		Port:             getenv("PORT", "8080"),
 		PostgresURL:      getenv("POSTGRES_URL", "postgres://postgres:postgres@localhost:5432/connect4?sslmode=disable"),
-		KafkaBrokers:     split(getenv("KAFKA_BROKERS", "localhost:9092")),
-		AllowedOrigins:   split(getenv("ALLOWED_ORIGINS", "http://localhost:5173,http://localhost:3000")),
+		KafkaBrokers:     split(getenv("KAFKA_BROKERS", "")),
+		AllowedOrigins:   split(getenv("ALLOWED_ORIGINS", "http://localhost:5173,http://localhost:3000,https://connect-4-ly15.onrender.com")),
 		BotWaitSeconds:   getenvInt("BOT_WAIT_SECONDS", 10),
 		ReconnectSeconds: getenvInt("RECONNECT_SECONDS", 30),
 	}
